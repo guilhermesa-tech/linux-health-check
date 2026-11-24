@@ -3,7 +3,8 @@
 # Uso: ./health-check.sh
 
 # ---- Configuração ----
-LIMITE=80	# Alerta quando o uso passar de 80%
+LIMITE=80			# Alerta quando o uso passar de 80%
+SERVICOS="cron NetworkManager"	#Serviços que devem estar rodando
 
 echo "===== Health Check: $(hostname) ====="
 echo "Data: $(date '+%d/%m/%Y %H:%M')"
@@ -32,3 +33,13 @@ if [ "$USO_MEMORIA" -gt "$LIMITE" ]; then
 else
 	echo "[OK]	Memória: ${USO_MEMORIA}% usada"
 fi
+
+# ---- 3. Serviços ----
+# Systemctl is-active --quiet -> Não mostra nada, só responde se está ativo ou não
+for SERVICO in $SERVICOS; do
+	if systemctl is-active --quiet "$SERVICO"; then
+		echo "[OK]	Serviço $SERVICO: Rodando"
+	else
+		echo "[ALERTA] 	Serviço $SERVICO: Parado"
+	fi
+done
