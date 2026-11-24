@@ -3,7 +3,7 @@
 # Uso: ./health-check.sh
 
 # ---- Configuração ----
-LIMITE=1	# Alerta quando o uso passar de 80%
+LIMITE=80	# Alerta quando o uso passar de 80%
 
 echo "===== Health Check: $(hostname) ====="
 echo "Data: $(date '+%d/%m/%Y %H:%M')"
@@ -19,4 +19,16 @@ if [ "$USO_DISCO" -gt "$LIMITE" ]; then
 	echo "[ALERTA]	Disco: ${USO_DISCO}% usado"
 else
 	echo "[OK]	Disco: ${USO_DISCO}% usado"
+fi
+
+# ---- 2. Memória ----
+# free		-> Mostra o uso da memória RAM
+# NR==2		-> Pega só a 2ª linha (a da memória RAM)
+# $3 /$2 * 100	-> Memória usada + total x 100 = porcentagem
+USO_MEMORIA=$(free | awk 'NR==2 {printf "%d", $3 / $2 * 100}')
+
+if [ "$USO_MEMORIA" -gt "$LIMITE" ]; then
+	echo "[ALERTA] 	Memória: ${USO_MEMORIA}% usada"
+else
+	echo "[OK]	Memória: ${USO_MEMORIA}% usada"
 fi
